@@ -21,7 +21,14 @@ function rctx_function {
 	
     echo Building RC ...
 	
-    cd /home/pi/wifibroadcast-rc
+    if [ "$EncryptionOrRange" == "Range" ]; then
+          cd /home/pi/wifibroadcast-rc
+    fi
+
+    if [ "$EncryptionOrRange" == "Encryption" ]; then
+		cd /home/pi/wifibroadcast-rc-encrypted/
+    fi
+    
     ionice -c 3 nice gcc -lrt -lpcap rctx.c -o /tmp/rctx `sdl-config --libs` `sdl-config --cflags` || {
 		echo "ERROR: Could not build RC, check joyconfig.txt!"
     }
