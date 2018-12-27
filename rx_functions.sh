@@ -168,6 +168,7 @@ function rx_function {
 		rm /tmp/pausewhile # remove pausewhile file to make sure check_alive and everything runs again
     fi
 
+    IsFirstTime=0;
     while true; do
         pause_while
 
@@ -182,6 +183,24 @@ function rx_function {
 		NICS=`ls /sys/class/net/ | nice grep -v eth0 | nice grep -v lo | nice grep -v usb | nice grep -v intwifi | nice grep -v wlan | nice grep -v relay | nice grep -v wifihotspot`
 
 		tmessage "Starting RX ... (FEC: $VIDEO_BLOCKS/$VIDEO_FECS/$VIDEO_BLOCKLENGTH)"
+		
+				#MYADD
+		if [ $IsFirstTime -eq 0 ]; then
+			if [ "$IsAudioTransferEnabled" == "1" ]; then
+				amixer cset numid=3 $DefaultAudioOut
+				/home/pi/RemoteSettings/Ground/AudioPlayback.sh &
+				/home/pi/RemoteSettings/Ground/RxAudio.sh &
+			fi
+
+			/home/pi/RemoteSettings/ipchecker/iphelper.sh > /dev/null 2>&1 &
+                	/usr/bin/python3.5 /home/pi/RemoteSettings/RemoteSettings.py > /dev/null 2>&1 &
+			/home/pi/RemoteSettings/RemoteSettingsWFBC_UDP.sh > /dev/null 2>&1 &
+			#/home/pi/RemoteSettings/GroundRSSI.sh &
+		fi
+		IsFirstTime=1
+		#MYADDEND
+		
+		
 		ionice -c 1 -n 3 /home/pi/wifibroadcast-base/rx -p 0 -d 1 -b $VIDEO_BLOCKS -r $VIDEO_FECS -f $VIDEO_BLOCKLENGTH $NICS | ionice -c 1 -n 4 nice -n -10 tee >(ionice -c 1 -n 4 nice -n -10 /home/pi/wifibroadcast-misc/ftee /root/videofifo2 > /dev/null 2>&1) >(ionice -c 1 nice -n -10 /home/pi/wifibroadcast-misc/ftee /root/videofifo4 > /dev/null 2>&1) >(ionice -c 3 nice /home/pi/wifibroadcast-misc/ftee /root/videofifo3 > /dev/null 2>&1) | ionice -c 1 -n 4 nice -n -10 /home/pi/wifibroadcast-misc/ftee /root/videofifo1 > /dev/null 2>&1
 
 		RX_EXITSTATUS=${PIPESTATUS[0]}
