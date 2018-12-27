@@ -225,7 +225,7 @@ function tx_function {
 		collect_debug /boot &
     fi
 
-    /home/pi/wifibroadcast-base/rssitx $NICS &
+    /home/pi/RemoteSettings/Air/rssitx.sh &
 
     echo
     echo "Starting transmission in $TXMODE mode, FEC $VIDEO_BLOCKS/$VIDEO_FECS/$VIDEO_BLOCKLENGTH: $WIDTH x $HEIGHT $FPS fps, video bitrate: $BITRATE_KBIT kBit/s, Keyframerate: $KEYFRAMERATE"
