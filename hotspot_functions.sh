@@ -47,6 +47,7 @@ function hotspot_check_function {
 	while true; do
 	    # pause loop while saving is in progress
 	    pause_while
+	    pidRX=`ps -ef | nice grep "rx -p 0" | nice grep -v grep | awk '{print $2}'`
 	    IP=0
 	    if [ "$ETHERNET_HOTSPOT" == "Y" ]; then
 			if nice ping -I eth0 -c 1 -W 1 -n -q 192.168.1.2 > /dev/null 2>&1; then
@@ -142,34 +143,38 @@ function hotspot_check_function {
 			# check if connection is still connected
 			IPTHERE=1
 			while [  $IPTHERE -eq 1 ]; do
-				if ping -c 2 -W 1 -n -q $IP > /dev/null 2>&1; then
+				pidRXNow=`ps -ef | nice grep "rx -p 0" | nice grep -v grep | awk '{print $2}'`
+                        	#if ping -c 2 -W 1 -n -q $IP > /dev/null 2>&1 && [ "$pidRX" == "$pidRXNow"  ]; then
+				ping -c 3 -W 1 -n -q $IP > /dev/null 2>&1
+				if [ $? -eq 0 ] && [ "$pidRX" == "$pidRXNow"  ]; then
 					IPTHERE=1
 					echo "IP $IP still connected ..."
 					else
-					echo "IP $IP gone"
-					
-					# kill and pause OSD so we can safeley start wbc_status
-					ps -ef | nice grep "osd" | nice grep -v grep | awk '{print $2}' | xargs kill -9
+						echo "IP $IP gone. Check 2..."
+						ping -c 3 -W 1 -n -q $IP > /dev/null 2>&1
+						if [ $? -ne 0 ] || [ "$pidRX" != "$pidRXNow"  ]; then
+							echo "IP $IP gone. Check 2 - gone."
+							# kill and pause OSD so we can safeley start wbc_status
+							ps -ef | nice grep "osd" | nice grep -v grep | awk '{print $2}' | xargs kill -9
 
-					killall wbc_status > /dev/null 2>&1
-					nice /home/pi/wifibroadcast-status/wbc_status "Secondary display disconnected (Hotspot)" 7 55 0
-					# re-start osd
-					OSDRUNNING=`pidof /tmp/osd | wc -w`
-					if [ $OSDRUNNING  -ge 1 ]; then
-						echo "OSD already running!"
-					else
-						killall wbc_status > /dev/null 2>&1
-						OSDRUNNING=`pidof /tmp/osd | wc -w`
-						if [ $OSDRUNNING  -ge 1 ]; then
-							echo "OSD already running!"
-						else
 							killall wbc_status > /dev/null 2>&1
-							/tmp/osd >> /wbc_tmp/telemetrydowntmp.txt &
-						fi
-					fi
-					
-					IPTHERE=0
-					
+							nice /home/pi/wifibroadcast-status/wbc_status "Secondary display disconnected (Hotspot)" 7 55 0
+							# re-start osd
+							OSDRUNNING=`pidof /tmp/osd | wc -w`
+							if [ $OSDRUNNING  -ge 1 ]; then
+								echo "OSD already running!"
+							else
+								killall wbc_status > /dev/null 2>&1
+								OSDRUNNING=`pidof /tmp/osd | wc -w`
+								if [ $OSDRUNNING  -ge 1 ]; then
+									echo "OSD already running!"
+								else
+									killall wbc_status > /dev/null 2>&1
+									/tmp/osd >> /wbc_tmp/telemetrydowntmp.txt &
+								fi
+							fi
+
+							IPTHERE=0					
 					# kill forwarding of video and telemetry to secondary display
 					ps -ef | nice grep "socat -b $VIDEO_UDP_BLOCKSIZE GOPEN:/root/videofifo2" | nice grep -v grep | awk '{print $2}' | xargs kill -9
 					ps -ef | nice grep "gst-launch-1.0 fdsrc" | nice grep -v grep | awk '{print $2}' | xargs kill -9
