@@ -590,6 +590,7 @@ function detect_nics {
 	    fi
 	fi
 
+	echo $NICS > /tmp/NICS_LIST
 	touch /tmp/nics_configured # let other processes know nics are setup and ready
 }
 
