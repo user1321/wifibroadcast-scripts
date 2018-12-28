@@ -59,6 +59,10 @@ function uplinkrx_and_rcrx_function {
     stty -F $FC_TELEMETRY_SERIALPORT $FC_TELEMETRY_STTY_OPTIONS $FC_TELEMETRY_BAUDRATE
 
     echo "Starting Uplink telemetry and R/C RX ..."
+    
+    if [ "$EncryptionOrRange" == "Encryption" ]; then
+   	RC="disabled"
+    fi
 	
     if [ "$RC" != "disabled" ]; then # with R/C
 		case $RC in
@@ -90,7 +94,7 @@ function uplinkrx_and_rcrx_function {
 		fi
     else # without R/C
 		#/home/pi/wifibroadcast-base/setupuart -d 1 -s $FC_TELEMETRY_SERIALPORT -b $FC_TELEMETRY_BAUDRATE
-		nice /home/pi/wifibroadcast-base/rx_rc_telemetry -p 3 -o 1 -r 99 $NICS > $FC_TELEMETRY_SERIALPORT
+		nice /home/pi/wifibroadcast-base/rx_rc_telemetry  -p 3 -o 0 -b $FC_TELEMETRY_BAUDRATE -s $FC_TELEMETRY_SERIALPORT -r 98 $NICS
     fi
 }
 
