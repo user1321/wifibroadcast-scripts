@@ -20,6 +20,8 @@ function rctx_function {
     echo
 	
     echo Building RC ...
+    
+    cd /home/pi/wifibroadcast-rc
 	
     if [ "$EncryptionOrRange" == "Range" ]; then
           cd /home/pi/wifibroadcast-rc
