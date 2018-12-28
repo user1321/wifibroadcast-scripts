@@ -239,6 +239,7 @@ if [ "$IsAudioTransferEnabled" == "1" ]; then
 fi
 
 /home/pi/RemoteSettings/RemoteSettingsWFBC_UDP_Air.sh > /dev/null &
+/home/pi/RemoteSettings/AirRSSI.sh &
 /usr/bin/python3.5 /home/pi/RemoteSettings/RemoteSettingsAir.py &
 
 echo "#!/bin/bash" > /dev/shm/startReadCameraTransfer.sh
