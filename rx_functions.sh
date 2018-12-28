@@ -195,7 +195,7 @@ function rx_function {
 			/home/pi/RemoteSettings/ipchecker/iphelper.sh > /dev/null 2>&1 &
                 	/usr/bin/python3.5 /home/pi/RemoteSettings/RemoteSettings.py > /dev/null 2>&1 &
 			/home/pi/RemoteSettings/RemoteSettingsWFBC_UDP.sh > /dev/null 2>&1 &
-			#/home/pi/RemoteSettings/GroundRSSI.sh &
+			/home/pi/RemoteSettings/GroundRSSI.sh &
 		fi
 		IsFirstTime=1
 		#MYADDEND
