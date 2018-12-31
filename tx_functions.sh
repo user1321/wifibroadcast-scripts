@@ -238,9 +238,24 @@ if [ "$IsAudioTransferEnabled" == "1" ]; then
         /home/pi/RemoteSettings/Air/AudioTX.sh &
 fi
 
-/home/pi/RemoteSettings/RemoteSettingsWFBC_UDP_Air.sh > /dev/null &
-/home/pi/RemoteSettings/AirRSSI.sh &
-/usr/bin/python3.5 /home/pi/RemoteSettings/RemoteSettingsAir.py &
+if [ "$RemoteSettingsEnabled" == "1" ]; then
+        echo "\n RemoteSettings enabled \n"
+        /home/pi/RemoteSettings/RemoteSettingsWFBC_UDP_Air.sh > /dev/null &
+        /home/pi/RemoteSettings/AirRSSI.sh &
+        /usr/bin/python3.5 /home/pi/RemoteSettings/RemoteSettingsAir.py &
+else
+        re='^[0-9]+$'
+        if ! [[ $RemoteSettingsEnabled =~ $re ]] ; then
+                echo "RemoteSettings - incorrect timer value \n"
+        else
+                if [ "$RemoteSettingsEnabled" -ne "0" ]; then
+                        echo "\n RemoteSettings enabled with timer \n"
+                         /home/pi/RemoteSettings/RemoteSettingsWFBC_UDP_Air.sh > /dev/null &
+                        /home/pi/RemoteSettings/AirRSSI.sh &
+                        /usr/bin/python3.5 /home/pi/RemoteSettings/RemoteSettingsAir.py $RemoteSettingsEnabled &
+                fi
+        fi
+fi
 
 echo "#!/bin/bash" > /dev/shm/startReadCameraTransfer.sh
 echo "echo \$\$ > /dev/shm/TXCAMPID" >> /dev/shm/startReadCameraTransfer.sh
