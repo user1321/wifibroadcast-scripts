@@ -478,6 +478,14 @@ function detect_nics {
 	    collect_errorlog
 	    sleep 365d
 	fi
+	
+    echo "HardCode dirty code for tests only. Values are it Hex, to set 10MHz use 0xa (10 in dec)"
+    echo 5 > /sys/kernel/debug/ieee80211/phy0/ath9k_htc/chanbw
+    echo 5 > /sys/kernel/debug/ieee80211/phy1/ath9k_htc/chanbw
+    echo 5 > /sys/kernel/debug/ieee80211/phy2/ath9k_htc/chanbw
+    echo 5 > /sys/kernel/debug/ieee80211/phy3/ath9k_htc/chanbw
+    echo 5 > /sys/kernel/debug/ieee80211/phy4/ath9k_htc/chanbw
+    echo 5 > /sys/kernel/debug/ieee80211/phy5/ath9k_htc/chanbw
 
     if [ "$CAM" == "0" ]; then # only do relay/hotspot stuff if RX
 	    # get wifi hotspot card out of the way
