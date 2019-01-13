@@ -626,14 +626,12 @@ function prepare_nic {
 
 	if [ "$CAM" == "0" ]; then # we are RX, set bitrate to uplink bitrate
 	    #tmessage -n "bitrate $UPLINK_WIFI_BITRATE Mbit "
-	    if [ "$UPLINK_WIFI_BITRATE" != "19.5" ]; then # only set bitrate if something else than 19.5 is requested (19.5 is default compiled in ath9k_htc firmware)
-		iw dev $1 set bitrates legacy-2.4 11 || {
+		iw dev $1 set bitrates legacy-2.4 2 || {
 		    echo
 		    echo "ERROR: Setting bitrate on $1 failed!"
 		    collect_errorlog
 		    sleep 365d
 		}
-	    fi
 	    sleep 0.2
 	    #tmessage -n "done. "
 	else # we are TX, set bitrate to downstream bitrate
