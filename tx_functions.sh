@@ -158,6 +158,22 @@ function tx_function {
 		echo "Using reduced bitrate: 1000 kBit due to undervoltage!"
 	fi
 
+
+	echo 5 > /sys/kernel/debug/ieee80211/phy2/ath9k_htc/chanbw
+	sleep 1
+	BITRATE_MEASURED_5=`/root/wifibroadcast/tx_measure -p 77 -b $VIDEO_BLOCKS -r $VIDEO_FECS -f $VIDEO_BLOCKLENGTH -t $VIDEO_FRAMETYPE -d $VIDEO_WIFI_BITRATE -y 0 $NICS`
+	BITRATE_5=$((BITRATE_MEASURED_5*$BITRATE_PERCENT/100))
+
+	sleep 1
+	echo 0xa > /sys/kernel/debug/ieee80211/phy0/ath9k_htc/chanbw
+	BITRATE_MEASURED_10=`/root/wifibroadcast/tx_measure -p 77 -b $VIDEO_BLOCKS -r $VIDEO_FECS -f $VIDEO_BLOCKLENGTH -t $VIDEO_FRAMETYPE -d $VIDEO_WIFI_BITRATE -y 0 $NICS`
+	BITRATE_10=$((BITRATE_MEASURED_10*$BITRATE_PERCENT/100))
+
+	sleep 1
+	echo 0 > /sys/kernel/debug/ieee80211/phy1/ath9k_htc/chanbw
+
+
+
     # check again if over-temp or under-voltage occured after bitrate measuring (but only if it didn't occur before yet)
 	if [ "$UNDERVOLT" == "0" ]; then
 		if vcgencmd get_throttled | nice grep -q -v "0x0"; then
@@ -263,11 +279,15 @@ echo "echo \$\$ > /dev/shm/TXCAMPID" >> /dev/shm/startReadCameraTransfer.sh
 NICS="${NICS//$'\n'/ }"
 
 echo "nice -n -9 raspivid -w $WIDTH -h $HEIGHT -fps $FPS -b $BITRATE -g $KEYFRAMERATE -t 0 $EXTRAPARAMS -o - | nice -n -9 /home/pi/wifibroadcast-base/tx_rawsock -p 0 -b $VIDEO_BLOCKS -r $VIDEO_FECS -f $VIDEO_BLOCKLENGTH -t $VIDEO_FRAMETYPE -d $VIDEO_WIFI_BITRATE -y 0 $NICS" >> /dev/shm/startReadCameraTransfer.sh
+echo "nice -n -9 raspivid -w $WIDTH -h $HEIGHT -fps $FPS -b $BITRATE_10 -g $KEYFRAMERATE -t 0 $EXTRAPARAMS -o - | nice -n -9 /home/pi/wifibroadcast-base/tx_rawsock -p 0 -b $VIDEO_BLOCKS -r $VIDEO_FECS -f $VIDEO_BLOCKLENGTH -t $VIDEO_FRAMETYPE -d $VIDEO_WIFI_BITRATE -y 0 $NICS" >> /dev/shm/startReadCameraTransfer_10.sh
+echo "nice -n -9 raspivid -w $WIDTH -h $HEIGHT -fps $FPS -b $BITRATE_5 -g $KEYFRAMERATE -t 0 $EXTRAPARAMS -o - | nice -n -9 /home/pi/wifibroadcast-base/tx_rawsock -p 0 -b $VIDEO_BLOCKS -r $VIDEO_FECS -f $VIDEO_BLOCKLENGTH -t $VIDEO_FRAMETYPE -d $VIDEO_WIFI_BITRATE -y 0 $NICS" >> /dev/shm/startReadCameraTransfer_5.sh
 
 echo $NICS > /tmp/NICS.txt
 echo $VIDEO_WIFI_BITRATE > /tmp/DATARATE.txt
 
 chmod +x /dev/shm/startReadCameraTransfer.sh
+chmod +x /dev/shm/startReadCameraTransfer_5.sh
+chmod +x /dev/shm/startReadCameraTransfer_10.sh
 /usr/bin/python /home/pi/cameracontrol/cameracontrolUDP.py -IsCamera1Enabled $IsCamera1Enabled -IsCamera2Enabled $IsCamera2Enabled -IsCamera3Enabled $IsCamera3Enabled -IsCamera4Enabled $IsCamera4Enabled  -Camera1ValueMin $Camera1ValueMin -Camera1ValueMax $Camera1ValueMax -Camera2ValueMin $Camera2ValueMin -Camera2ValueMax $Camera2ValueMax -Camera3ValueMin $Camera3ValueMin -Camera3ValueMax $Camera3ValueMax  -Camera4ValueMin $Camera4ValueMin -Camera4ValueMax $Camera4ValueMax -DefaultCameraId $DefaultCameraId
 
 

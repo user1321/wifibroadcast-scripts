@@ -54,7 +54,7 @@ function rctx_function {
     echo "Starting R/C TX ..."
 	
     while true; do
-    	nice -n -5 /tmp/rctx $NICS
+    	nice -n -5 /tmp/rctx 1 $NICS
 	NICS=`ls /sys/class/net/ | nice grep -v eth0 | nice grep -v lo | nice grep -v usb | nice grep -v intwifi | nice grep -v relay | nice grep -v wifihotspot`
 	sleep 1
     done
