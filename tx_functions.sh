@@ -258,6 +258,10 @@ else
         fi
 fi
 
+if [ "$IsBandSwicherEnabled" == "1" ]; then
+        /home/pi/RemoteSettings/BandSwitcherAir.sh &
+fi
+
 echo "#!/bin/bash" > /dev/shm/startReadCameraTransfer.sh
 echo "echo \$\$ > /dev/shm/TXCAMPID" >> /dev/shm/startReadCameraTransfer.sh
 
