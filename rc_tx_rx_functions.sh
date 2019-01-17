@@ -31,6 +31,10 @@ function rctx_function {
 		cd /home/pi/wifibroadcast-rc-encrypted/
     fi
     
+    if [ "$EncryptionOrRange" == "RangeAth9k" ]; then
+        cd /home/pi/wifibroadcast-rc-Ath9k/
+    fi
+    
     ionice -c 3 nice gcc -lrt -lpcap rctx.c -o /tmp/rctx `sdl-config --libs` `sdl-config --cflags` || {
 		echo "ERROR: Could not build RC, check joyconfig.txt!"
     }
@@ -54,8 +58,16 @@ function rctx_function {
     echo "Starting R/C TX ..."
 	
     while true; do
-    	nice -n -5 /tmp/rctx $ChannelToListen2 $PrimaryCardMAC
-	NICS=`ls /sys/class/net/ | nice grep -v eth0 | nice grep -v lo | nice grep -v usb | nice grep -v intwifi | nice grep -v relay | nice grep -v wifihotspot`
-	sleep 1
+    
+    	if [ "$EncryptionOrRange" == "Range" ] || [ "$EncryptionOrRange" == "Encryption" ]; then
+		nice -n -5 /tmp/rctx $ChannelToListen2 $PrimaryCardMAC
+		NICS=`ls /sys/class/net/ | nice grep -v eth0 | nice grep -v lo | nice grep -v usb | nice grep -v intwifi | nice grep -v relay | nice grep -v wifihotspot`
+	fi
+	
+	if [ "$EncryptionOrRange" == "RangeAth9k" ]; then
+                nice -n -5 /tmp/rctx $ChannelToListen2 $PrimaryCardMAC
+        fi
+	
+    	sleep 1
     done
 }
