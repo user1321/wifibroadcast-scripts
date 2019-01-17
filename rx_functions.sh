@@ -196,6 +196,10 @@ function rx_function {
                 	/usr/bin/python3.5 /home/pi/RemoteSettings/RemoteSettings.py > /dev/null 2>&1 &
 			/home/pi/RemoteSettings/RemoteSettingsWFBC_UDP.sh > /dev/null 2>&1 &
 			/home/pi/RemoteSettings/GroundRSSI.sh &
+			
+			if [ "$IsBandSwicherEnabled" == "1" ]; then
+        			/home/pi/RemoteSettings/BandSwitcher.sh &
+			fi
 		fi
 		IsFirstTime=1
 		#MYADDEND
