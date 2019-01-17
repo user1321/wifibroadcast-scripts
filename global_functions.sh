@@ -479,7 +479,7 @@ function detect_nics {
 	    sleep 365d
 	fi
 
-	if [ "$DefaultBandWidthAth9k" == "10" ]; then
+	if [ "$Bandwidth" == "10" ]; then
 		echo "HardCode dirty code for tests only. Values are it Hex, to set 10MHz use 0xa (10 in dec)"
 		echo 0xa > /sys/kernel/debug/ieee80211/phy0/ath9k_htc/chanbw
 		echo 0xa > /sys/kernel/debug/ieee80211/phy1/ath9k_htc/chanbw
@@ -488,7 +488,7 @@ function detect_nics {
 		echo 0xa > /sys/kernel/debug/ieee80211/phy4/ath9k_htc/chanbw
 	fi
 	
-	if [ "$DefaultBandWidthAth9k" == "5" ]; then
+	if [ "$Bandwidth" == "5" ]; then
 	        echo "HardCode dirty code for tests only. Values are it Hex, to set 10MHz use 0xa (10 in dec)"
 		echo 5 > /sys/kernel/debug/ieee80211/phy0/ath9k_htc/chanbw
 		echo 5 > /sys/kernel/debug/ieee80211/phy1/ath9k_htc/chanbw
