@@ -479,13 +479,24 @@ function detect_nics {
 	    sleep 365d
 	fi
 
+	if [ "$DefaultBandWidthAth9k" == "10" ]; then
+		echo "HardCode dirty code for tests only. Values are it Hex, to set 10MHz use 0xa (10 in dec)"
+		echo 0xa > /sys/kernel/debug/ieee80211/phy0/ath9k_htc/chanbw
+		echo 0xa > /sys/kernel/debug/ieee80211/phy1/ath9k_htc/chanbw
+		echo 0xa > /sys/kernel/debug/ieee80211/phy2/ath9k_htc/chanbw
+		echo 0xa > /sys/kernel/debug/ieee80211/phy3/ath9k_htc/chanbw
+		echo 0xa > /sys/kernel/debug/ieee80211/phy4/ath9k_htc/chanbw
+	fi
+	
+	if [ "$DefaultBandWidthAth9k" == "5" ]; then
+	        echo "HardCode dirty code for tests only. Values are it Hex, to set 10MHz use 0xa (10 in dec)"
+		echo 5 > /sys/kernel/debug/ieee80211/phy0/ath9k_htc/chanbw
+		echo 5 > /sys/kernel/debug/ieee80211/phy1/ath9k_htc/chanbw
+		echo 5 > /sys/kernel/debug/ieee80211/phy2/ath9k_htc/chanbw
+		echo 5 > /sys/kernel/debug/ieee80211/phy3/ath9k_htc/chanbw
+		echo 5 > /sys/kernel/debug/ieee80211/phy4/ath9k_htc/chanbw
+	fi
 
-        #echo "HardCode dirty code for tests only. Values are it Hex, to set 10MHz use 0xa (10 in dec)"
-        #echo 5 > /sys/kernel/debug/ieee80211/phy0/ath9k_htc/chanbw
-        #echo 5 > /sys/kernel/debug/ieee80211/phy1/ath9k_htc/chanbw
-        #echo 5 > /sys/kernel/debug/ieee80211/phy2/ath9k_htc/chanbw
-        #echo 5 > /sys/kernel/debug/ieee80211/phy3/ath9k_htc/chanbw
-        #echo 5 > /sys/kernel/debug/ieee80211/phy4/ath9k_htc/chanbw
 
     if [ "$CAM" == "0" ]; then # only do relay/hotspot stuff if RX
 	    # get wifi hotspot card out of the way
@@ -626,7 +637,7 @@ function prepare_nic {
 
 	if [ "$CAM" == "0" ]; then # we are RX, set bitrate to uplink bitrate
 	    #tmessage -n "bitrate $UPLINK_WIFI_BITRATE Mbit "
-		iw dev $1 set bitrates legacy-2.4 2 || {
+		iw dev $1 set bitrates legacy-2.4 $UplinkSpeed || {
 		    echo
 		    echo "ERROR: Setting bitrate on $1 failed!"
 		    collect_errorlog
