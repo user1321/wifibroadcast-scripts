@@ -31,9 +31,15 @@ function rctx_function {
 		cd /home/pi/wifibroadcast-rc-encrypted/
     fi
     
-    if [ "$EncryptionOrRange" == "RangeAth9k" ]; then
-        cd /home/pi/wifibroadcast-rc-Ath9k/
+    if [ "$PrimaryCardMAC" == "0" ]; then
+    	echo "PrimaryCardMAC not selected. RC Joystick program will use WiFi card with best RSSI as tx."
+    else
+    	echo "PrimaryCardMAC selected to: $PrimaryCardMAC"
+    	if [ "$IsBandSwicherEnabled" == "1" ]; then
+        	cd /home/pi/wifibroadcast-rc-Ath9k/
+    	fi
     fi
+  
     
     ionice -c 3 nice gcc -lrt -lwiringPi -lpcap rctx.c -o /tmp/rctx `sdl-config --libs` `sdl-config --cflags` || {
 		echo "ERROR: Could not build RC, check joyconfig.txt!"
@@ -59,15 +65,19 @@ function rctx_function {
 	
     while true; do
     
-    	if [ "$EncryptionOrRange" == "Range" ] || [ "$EncryptionOrRange" == "Encryption" ]; then
-		nice -n -5 /tmp/rctx $NICS
-		NICS=`ls /sys/class/net/ | nice grep -v eth0 | nice grep -v lo | nice grep -v usb | nice grep -v intwifi | nice grep -v relay | nice grep -v wifihotspot`
-	fi
-	
-	if [ "$EncryptionOrRange" == "RangeAth9k" ]; then
-                nice -n -5 /tmp/rctx $ChannelToListen2 $PrimaryCardMAC
-        fi
-	
-    	sleep 1
+        if [ "$IsBandSwicherEnabled" == "1" ]; then
+		nice -n -5 /tmp/rctx $ChannelToListen2 $PrimaryCardMAC
+		sleep 1
+	else
+		if [ "$PrimaryCardMAC" == "0" ]; then
+			nice -n -5 /tmp/rctx $NICS
+			sleep 1
+			NICS=`ls /sys/class/net/ | nice grep -v eth0 | nice grep -v lo | nice grep -v usb | nice grep -v intwifi | nice grep -v relay | nice grep -v wifihotspot`
+		else
+			nice -n -5 /tmp/rctx $PrimaryCardMAC
+			sleep 1
+		fi
+    	fi
+
     done
 }
