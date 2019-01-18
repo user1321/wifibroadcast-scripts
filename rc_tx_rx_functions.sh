@@ -36,6 +36,7 @@ function rctx_function {
     else
     	echo "PrimaryCardMAC selected to: $PrimaryCardMAC"
     	if [ "$IsBandSwicherEnabled" == "1" ]; then
+		echo "BandSwicher Enabled"
         	cd /home/pi/wifibroadcast-rc-Ath9k/
     	fi
     fi
@@ -65,19 +66,22 @@ function rctx_function {
 	
     while true; do
     
-        if [ "$IsBandSwicherEnabled" == "1" ]; then
-		nice -n -5 /tmp/rctx $ChannelToListen2 $PrimaryCardMAC
+    	if [ "$PrimaryCardMAC" == "0" ]; then
+		if [ "$IsBandSwicherEnabled" == "1" ]; then
+			echo "To use BandSwitcher select dedicated WiFi card for Tx. Set PrimaryCardMAC"
+		fi
+		nice -n -5 /tmp/rctx $NICS
 		sleep 1
+		NICS=`ls /sys/class/net/ | nice grep -v eth0 | nice grep -v lo | nice grep -v usb | nice grep -v intwifi | nice grep -v relay | nice grep -v wifihotspot`
 	else
-		if [ "$PrimaryCardMAC" == "0" ]; then
-			nice -n -5 /tmp/rctx $NICS
-			sleep 1
-			NICS=`ls /sys/class/net/ | nice grep -v eth0 | nice grep -v lo | nice grep -v usb | nice grep -v intwifi | nice grep -v relay | nice grep -v wifihotspot`
+		if [ "$IsBandSwicherEnabled" == "1" ]; then
+			nice -n -5 /tmp/rctx $ChannelToListen2 $PrimaryCardMAC
+			sleep 1	
 		else
 			nice -n -5 /tmp/rctx $PrimaryCardMAC
 			sleep 1
 		fi
-    	fi
+	fi
 
     done
 }
